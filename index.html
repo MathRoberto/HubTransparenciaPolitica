@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Financeira Inteligente</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Central Financeira Inteligente</h1>
+    </header>
+
+    <main>
+        <section class="cards-container">
+            <div class="card" id="dolar-card">
+                <h2>Dólar Hoje</h2>
+                <p id="dolar-value">Carregando...</p>
+            </div>
+
+            <div class="card" id="euro-card">
+                <h2>Euro Hoje</h2>
+                <p id="euro-value">Carregando...</p>
+            </div>
+
+            <div class="card" id="selic-card">
+                <h2>Taxa SELIC</h2>
+                <p id="selic-value">Carregando...</p>
+            </div>
+        </section>
+
+        <section class="converter">
+    <h2>Conversor de Moedas</h2>
+
+    <div class="form-group">
+      <label for="amount">Valor:</label>
+      <input type="number" id="amount" placeholder="Digite o valor" min="0" step="any" />
+    </div>
+
+    <div class="form-group">
+      <label for="from-currency">De:</label>
+      <select id="from-currency">
+        <option value="BRL">Real (BRL)</option>
+        <option value="USD">Dólar (USD)</option>
+        <option value="EUR">Euro (EUR)</option>
+        <option value="GBP">Libra Esterlina (GBP)</option>
+        <option value="JPY">Iene (JPY)</option>
+        <!-- Pode adicionar outras moedas aqui -->
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="to-currency">Para:</label>
+      <select id="to-currency">
+        <option value="BRL">Real (BRL)</option>
+        <option value="USD">Dólar (USD)</option>
+        <option value="EUR">Euro (EUR)</option>
+        <option value="GBP">Libra Esterlina (GBP)</option>
+        <option value="JPY">Iene (JPY)</option>
+      </select>
+    </div>
+
+    <button id="convert-btn">Converter</button>
+
+  <p id="conversion-result"></p>
+</section>
+
+        <section class="cnpj-consult">
+            <h2>Consulta de CNPJ</h2>
+            <input type="text" id="cnpj" placeholder="Digite o CNPJ">
+            <button onclick="consultCNPJ()">Consultar</button>
+            <div id="cnpj-result"></div>
+        </section>
+
+        <section class="news">
+            <h2>Últimas Notícias de Economia</h2>
+            <div id="news-list">Carregando...</div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Central Financeira Inteligente</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
