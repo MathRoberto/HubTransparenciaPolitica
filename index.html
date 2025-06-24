@@ -1,87 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central Financeira Inteligente</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hub de Transparência Política</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/535/535239.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header>
-        <h1>Central Financeira Inteligente</h1>
-    </header>
+  <header>
+    <h1>Hub de Transparência Política</h1>
+    <p>Consultas em tempo real sobre Deputados e Proposições</p>
+  </header>
 
-    <main>
-        <section class="cards-container">
-            <div class="card" id="dolar-card">
-                <h2>Dólar Hoje</h2>
-                <p id="dolar-value">Carregando...</p>
-            </div>
+  <nav class="filters">
+    <select id="estado-filter" aria-label="Filtrar por Estado">
+      <option value="">Filtrar por Estado</option>
+    </select>
 
-            <div class="card" id="euro-card">
-                <h2>Euro Hoje</h2>
-                <p id="euro-value">Carregando...</p>
-            </div>
+    <select id="partido-filter" aria-label="Filtrar por Partido">
+      <option value="">Filtrar por Partido</option>
+    </select>
 
-            <div class="card" id="selic-card">
-                <h2>Taxa SELIC</h2>
-                <p id="selic-value">Carregando...</p>
-            </div>
-        </section>
+    <button id="filter-btn" aria-label="Aplicar filtros">Aplicar Filtro</button>
+  </nav>
 
-        <section class="converter">
-    <h2>Conversor de Moedas</h2>
+  <nav class="menu" role="tablist" aria-label="Menu principal">
+    <button id="btn-deputados" class="active" role="tab" aria-selected="true" aria-controls="deputados-section">Deputados</button>
+    <button id="btn-proposicoes" role="tab" aria-selected="false" aria-controls="proposicoes-section">Últimas Proposições</button>
+  </nav>
 
-    <div class="form-group">
-      <label for="amount">Valor:</label>
-      <input type="number" id="amount" placeholder="Digite o valor" min="0" step="any" />
-    </div>
+  <main>
+    <section id="deputados-section" role="tabpanel" aria-labelledby="btn-deputados">
+      <h2>Deputados Federais</h2>
+      <div id="deputados-list" class="cards-container"></div>
+    </section>
 
-    <div class="form-group">
-      <label for="from-currency">De:</label>
-      <select id="from-currency">
-        <option value="BRL">Real (BRL)</option>
-        <option value="USD">Dólar (USD)</option>
-        <option value="EUR">Euro (EUR)</option>
-        <option value="GBP">Libra Esterlina (GBP)</option>
-        <option value="JPY">Iene (JPY)</option>
-        <!-- Pode adicionar outras moedas aqui -->
-      </select>
-    </div>
+    <section id="proposicoes-section" class="hidden" role="tabpanel" aria-labelledby="btn-proposicoes">
+      <h2>Últimas Proposições</h2>
+      <div id="proposicoes-list" class="cards-container"></div>
+    </section>
+  </main>
 
-    <div class="form-group">
-      <label for="to-currency">Para:</label>
-      <select id="to-currency">
-        <option value="BRL">Real (BRL)</option>
-        <option value="USD">Dólar (USD)</option>
-        <option value="EUR">Euro (EUR)</option>
-        <option value="GBP">Libra Esterlina (GBP)</option>
-        <option value="JPY">Iene (JPY)</option>
-      </select>
-    </div>
+  <footer>
+    <p>Dados fornecidos por <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener noreferrer">Câmara dos Deputados</a></p>
+  </footer>
 
-    <button id="convert-btn">Converter</button>
-
-  <p id="conversion-result"></p>
-</section>
-
-        <section class="cnpj-consult">
-            <h2>Consulta de CNPJ</h2>
-            <input type="text" id="cnpj" placeholder="Digite o CNPJ">
-            <button onclick="consultCNPJ()">Consultar</button>
-            <div id="cnpj-result"></div>
-        </section>
-
-        <section class="news">
-            <h2>Últimas Notícias de Economia</h2>
-            <div id="news-list">Carregando...</div>
-        </section>
-    </main>
-
-    <footer>
-        <p>© 2025 Central Financeira Inteligente</p>
-    </footer>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

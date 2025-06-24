@@ -1,102 +1,162 @@
-// Carregar cotações ao iniciar
-document.addEventListener('DOMContentLoaded', () => {
-    loadExchangeRates();
-    loadNews();
+let todosDeputados = [];
+let todasProposicoes = [];
+
+// Função para carregar deputados (igual antes)
+async function carregarDeputados() {
+  const url = 'https://dadosabertos.camara.leg.br/api/v2/deputados?itens=100&ordenarPor=nome&ordem=asc';
+  const res = await fetch(url);
+  const data = await res.json();
+  todosDeputados = data.dados;
+  preencherFiltros(todosDeputados);
+  renderizarDeputados(todosDeputados);
+}
+
+async function carregarProposicoes() {
+  try {
+    const url = 'https://dadosabertos.camara.leg.br/api/v2/proposicoes?itens=10&ordem=desc';
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.error('Erro na API de proposições:', res.status);
+      return;
+    }
+    const data = await res.json();
+    if (!data.dados) {
+      console.error('Dados das proposições não encontrados');
+      return;
+    }
+    renderizarProposicoes(data.dados);
+  } catch (e) {
+    console.error('Erro ao carregar proposições:', e);
+  }
+}
+
+
+// Renderizar deputados no container
+function renderizarDeputados(deputados) {
+  const container = document.getElementById('deputados-list');
+  container.innerHTML = '';
+
+  if (deputados.length === 0) {
+    container.innerHTML = '<p>Nenhum deputado encontrado.</p>';
+    return;
+  }
+
+  deputados.forEach(d => {
+    container.innerHTML += `
+      <div class="politico-card">
+        <img src="${d.urlFoto}" alt="Foto de ${d.nome}" />
+        <h3>${d.nome}</h3>
+        <p><strong>Partido:</strong> ${d.siglaPartido}</p>
+        <p><strong>Estado:</strong> ${d.siglaUf}</p>
+        <p><a href="${d.uri}" target="_blank" rel="noopener noreferrer">Perfil Oficial</a></p>
+      </div>
+    `;
+  });
+}
+
+// Renderizar proposições no container
+function renderizarProposicoes(proposicoes) {
+  const container = document.getElementById('proposicoes-list');
+  container.innerHTML = ''; // limpa
+
+  proposicoes.forEach(prop => {
+    const dataFormatada = new Date(prop.dataApresentacao).toLocaleDateString('pt-BR');
+
+    const card = document.createElement('div');
+    card.classList.add('card-proposicao');
+
+    card.innerHTML = `
+      <h3>${prop.siglaTipo} ${prop.numero}/${prop.ano}</h3>
+      <p><strong>Ementa:</strong> ${prop.ementa || 'Sem descrição'}</p>
+      <p><strong>Data:</strong> ${dataFormatada}</p>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+// Preencher filtros Estado e Partido com os dados dos deputados
+function preencherFiltros(deputados) {
+  const estadosSet = new Set();
+  const partidosSet = new Set();
+
+  deputados.forEach(d => {
+    estadosSet.add(d.siglaUf);
+    partidosSet.add(d.siglaPartido);
+  });
+
+  const estadoFilter = document.getElementById('estado-filter');
+  const partidoFilter = document.getElementById('partido-filter');
+
+  // Limpa antes de preencher
+  estadoFilter.innerHTML = '<option value="">Filtrar por Estado</option>';
+  partidoFilter.innerHTML = '<option value="">Filtrar por Partido</option>';
+
+  Array.from(estadosSet).sort().forEach(uf => {
+    estadoFilter.innerHTML += `<option value="${uf}">${uf}</option>`;
+  });
+
+  Array.from(partidosSet).sort().forEach(p => {
+    partidoFilter.innerHTML += `<option value="${p}">${p}</option>`;
+  });
+}
+
+// Função que aplica o filtro para deputados e proposições simultaneamente
+function aplicarFiltro() {
+  const estado = document.getElementById('estado-filter').value;
+  const partido = document.getElementById('partido-filter').value;
+
+  // Filtrar deputados
+  const deputadosFiltrados = todosDeputados.filter(d => {
+    return (estado === '' || d.siglaUf === estado) &&
+           (partido === '' || d.siglaPartido === partido);
+  });
+
+  renderizarDeputados(deputadosFiltrados);
+
+  // Filtrar proposições: vamos filtrar só pelo estado do autor (para simplificar)
+  const proposicoesFiltradas = todasProposicoes.filter(p => {
+    // Proposições têm um array de autores, cada um com 'siglaUf' (estado)
+    if (!p.autores || p.autores.length === 0) return false;
+
+    return p.autores.some(autor => {
+      if (estado !== '' && autor.siglaUf !== estado) return false;
+
+      // Se partido estiver preenchido, ignorar para proposições (pode melhorar depois)
+      return true;
+    });
+  });
+
+  renderizarProposicoes(proposicoesFiltradas);
+}
+
+// Controle de abas
+document.getElementById('btn-deputados').addEventListener('click', () => {
+  mostrarSecao('deputados-section');
+  ativarBotao('btn-deputados');
 });
 
-function loadExchangeRates() {
-    // Dólar
-    fetch('https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao=\'06-24-2025\'&$top=1&$orderby=cotacaoCompra desc&$format=json')
-        .then(response => response.json())
-        .then(data => {
-            const dolar = data.value[0].cotacaoCompra;
-            document.getElementById('dolar-value').innerText = `R$ ${dolar.toFixed(2)}`;
-            window.currentDolar = dolar;
-        });
+document.getElementById('btn-proposicoes').addEventListener('click', () => {
+  mostrarSecao('proposicoes-section');
+  ativarBotao('btn-proposicoes');
+});
 
-    // Euro
-    fetch('https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoEuroDia(dataCotacao=@dataCotacao)?@dataCotacao=\'06-24-2025\'&$top=1&$orderby=cotacaoCompra desc&$format=json')
-        .then(response => response.json())
-        .then(data => {
-            const euro = data.value[0].cotacaoCompra;
-            document.getElementById('euro-value').innerText = `R$ ${euro.toFixed(2)}`;
-            window.currentEuro = euro;
-        });
-
-    // Taxa Selic
-    fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.4189/dados/ultimos/1?formato=json')
-        .then(response => response.json())
-        .then(data => {
-            const selic = data[0].valor;
-            document.getElementById('selic-value').innerText = `${selic}% a.a.`;
-        });
+function mostrarSecao(id) {
+  document.getElementById('deputados-section').classList.add('hidden');
+  document.getElementById('proposicoes-section').classList.add('hidden');
+  document.getElementById(id).classList.remove('hidden');
 }
 
-function convertCurrency() {
-    const amount = parseFloat(document.getElementById('amount').value);
-    const currency = document.getElementById('currency').value;
-
-    if (isNaN(amount)) {
-        alert('Digite um valor válido.');
-        return;
-    }
-
-    let rate = currency === 'USD' ? window.currentDolar : window.currentEuro;
-    const result = amount / rate;
-
-    document.getElementById('conversion-result').innerText = `≈ ${currency} ${result.toFixed(2)}`;
+function ativarBotao(id) {
+  document.querySelectorAll('.menu button').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function consultCNPJ() {
-    let cnpjInput = document.getElementById('cnpj').value;
+// Evento aplicar filtro
+document.getElementById('filter-btn').addEventListener('click', aplicarFiltro);
 
-    // Remove tudo que não for número
-    const cnpj = cnpjInput.replace(/\D/g, '');
-
-    if (!cnpj || cnpj.length !== 14) {
-        alert('Digite um CNPJ válido com 14 números.');
-        return;
-    }
-
-    fetch(`https://receitaws.com.br/v1/cnpj/${cnpj}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ERROR') {
-                document.getElementById('cnpj-result').innerText = 'CNPJ não encontrado.';
-            } else {
-                document.getElementById('cnpj-result').innerHTML = `
-                    <p><strong>Nome:</strong> ${data.nome}</p>
-                    <p><strong>Situação:</strong> ${data.situacao}</p>
-                    <p><strong>Endereço:</strong> ${data.logradouro}, ${data.bairro} - ${data.municipio}/${data.uf}</p>
-                `;
-            }
-        })
-        .catch(() => {
-            document.getElementById('cnpj-result').innerText = 'Erro ao consultar CNPJ.';
-        });
-}
-
-
-function loadNews() {
-    // Usando NewsAPI
-    const apiKey = '7a67384d04f74b92b0c196a0a5aa9dea';
-    fetch(`https://newsapi.org/v2/top-headlines?country=br&category=business&apiKey=${apiKey}`)
-        .then(response => response.json())
-        .then(data => {
-            const newsList = document.getElementById('news-list');
-            newsList.innerHTML = '';
-
-            data.articles.slice(0, 5).forEach(article => {
-                const newsItem = document.createElement('div');
-                newsItem.classList.add('news-item');
-                newsItem.innerHTML = `
-                    <h4>${article.title}</h4>
-                    <a href="${article.url}" target="_blank">Leia mais</a>
-                `;
-                newsList.appendChild(newsItem);
-            });
-        })
-        .catch(() => {
-            document.getElementById('news-list').innerText = 'Erro ao carregar notícias.';
-        });
-}
+// Carregamento inicial
+window.onload = () => {
+  carregarDeputados();
+  carregarProposicoes();
+};
