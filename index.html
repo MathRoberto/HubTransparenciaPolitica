@@ -13,18 +13,6 @@
     <p>Consultas em tempo real sobre Deputados e Proposições</p>
   </header>
 
-  <nav class="filters">
-    <select id="estado-filter" aria-label="Filtrar por Estado">
-      <option value="">Filtrar por Estado</option>
-    </select>
-
-    <select id="partido-filter" aria-label="Filtrar por Partido">
-      <option value="">Filtrar por Partido</option>
-    </select>
-
-    <button id="filter-btn" aria-label="Aplicar filtros">Aplicar Filtro</button>
-  </nav>
-
   <nav class="menu" role="tablist" aria-label="Menu principal">
     <button id="btn-deputados" class="active" role="tab" aria-selected="true" aria-controls="deputados-section">Deputados</button>
     <button id="btn-proposicoes" role="tab" aria-selected="false" aria-controls="proposicoes-section">Últimas Proposições</button>
@@ -33,11 +21,26 @@
   <main>
     <section id="deputados-section" role="tabpanel" aria-labelledby="btn-deputados">
       <h2>Deputados Federais</h2>
+      <nav id="filtro-deputados" class="filters">
+        <select id="estado-filter" aria-label="Filtrar por Estado">
+          <option value="">Filtrar por Estado</option>
+        </select>
+        <select id="partido-filter" aria-label="Filtrar por Partido">
+          <option value="">Filtrar por Partido</option>
+        </select>
+        <button id="filter-btn" aria-label="Aplicar filtros">Aplicar Filtro</button>
+      </nav>
       <div id="deputados-list" class="cards-container"></div>
     </section>
 
     <section id="proposicoes-section" class="hidden" role="tabpanel" aria-labelledby="btn-proposicoes">
       <h2>Últimas Proposições</h2>
+      <nav id="filtro-proposicoes" class="filters hidden">
+        <select id="tipo-proposicao-filter" aria-label="Filtrar por Tipo de Proposição">
+          <option value="">Filtrar por Tipo</option>
+        </select>
+        <button id="filter-proposicoes-btn" aria-label="Aplicar filtro nas proposições">Aplicar Filtro</button>
+      </nav>
       <div id="proposicoes-list" class="cards-container"></div>
     </section>
   </main>
