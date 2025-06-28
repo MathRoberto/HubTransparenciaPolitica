@@ -1,9 +1,6 @@
 let todosDeputados = [];
 let todasProposicoes = [];
 let todasNoticias = []; 
-const NEWS_API_KEY = '7a67384d04f74b92b0c196a0a5aa9dea'; // 
-
-
 // --- Funções de Carregamento de Dados ---
 
 async function carregarDeputados() {
@@ -43,41 +40,33 @@ async function carregarProposicoesIniciais() {
     }
 }
 
-
 async function carregarNoticias(query = '') {
-    let url;
-    // Define um termo padrão se a busca estiver vazia
     const defaultQuery = "política"; 
+    const searchTerm = query.trim() === '' ? defaultQuery : (query);
 
-    if (query.trim() === '') {
-        // Se a query estiver vazia, usa o termo padrão no endpoint 'everything'
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(defaultQuery)}&language=pt&sortBy=relevancy&apiKey=${NEWS_API_KEY}`;
-    } else {
-        
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query + " política")}&language=pt&sortBy=relevancy&apiKey=${NEWS_API_KEY}`;
-    }
+    const functionUrl = `/.netlify/functions/get-news?query=${encodeURIComponent(searchTerm)}`;
 
     try {
-        const res = await fetch(url);
+        const res = await fetch(functionUrl);
         if (!res.ok) {
             const errorData = await res.json();
-            console.error('Erro na API de Notícias:', res.status, errorData.message || 'Erro desconhecido.');
+            console.error('Erro ao chamar Netlify Function (Notícias):', res.status, errorData.message || 'Erro desconhecido.');
             renderizarNoticias([]);
             return;
         }
         
-        const data = await res.json();
+        const data = await res.json(); 
 
         if (data.status === 'ok' && data.articles) {
-            todasNoticias = data.articles;
+            todasNoticias = data.articles; 
             renderizarNoticias(todasNoticias);
         } else {
-            console.error('Dados de notícias não encontrados ou status não OK:', data.message);
+            console.error('Dados de notícias não encontrados ou status não OK da função:', data.message);
             renderizarNoticias([]);
         }
 
     } catch (e) {
-        console.error('Erro inesperado ao carregar notícias:', e);
+        console.error('Erro inesperado ao carregar notícias (requisição para Netlify Function falhou):', e);
         renderizarNoticias([]);
     }
 }
@@ -137,7 +126,6 @@ function renderizarNoticias(noticias) {
     }
 
     noticias.forEach(n => {
-
         container.innerHTML += `
             <div class="noticia-card">
                 <h3>${n.title || 'Sem Título'}</h3>
@@ -235,7 +223,7 @@ document.getElementById('btn-proposicoes').addEventListener('click', () => {
     ativarBotao('btn-proposicoes');
 });
 
-// NOVO EVENTO: Botão para a aba de Notícias
+// EVENTO: Botão para a aba de Notícias
 document.getElementById('btn-noticias').addEventListener('click', () => {
     mostrarSecao('noticias-section');
     ativarBotao('btn-noticias');
@@ -252,11 +240,12 @@ function mostrarSecao(id) {
     // Esconde todas as seções principais
     document.getElementById('deputados-section').classList.add('hidden');
     document.getElementById('proposicoes-section').classList.add('hidden');
-    document.getElementById('noticias-section').classList.add('hidden'); 
+    document.getElementById('noticias-section').classList.add('hidden'); // Adicionado
+
     // Esconde todas as barras de filtro
     document.getElementById('filtro-deputados').classList.add('hidden');
     document.getElementById('filtro-proposicoes').classList.add('hidden');
-    document.getElementById('filtro-noticias').classList.add('hidden'); 
+    document.getElementById('filtro-noticias').classList.add('hidden'); // Adicionado
 
     // Mostra a seção selecionada
     document.getElementById(id).classList.remove('hidden');
@@ -284,4 +273,5 @@ window.onload = () => {
     carregarProposicoesIniciais();
     mostrarSecao('deputados-section');
     ativarBotao('btn-deputados');
+    // As notícias serão carregadas apenas quando a aba 'Notícias' for clicada.
 };
