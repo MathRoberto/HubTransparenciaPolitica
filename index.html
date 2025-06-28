@@ -16,6 +16,7 @@
   <nav class="menu" role="tablist" aria-label="Menu principal">
     <button id="btn-deputados" class="active" role="tab" aria-selected="true" aria-controls="deputados-section">Deputados</button>
     <button id="btn-proposicoes" role="tab" aria-selected="false" aria-controls="proposicoes-section">Últimas Proposições</button>
+    <button id="btn-noticias" role="tab" aria-selected="false" aria-controls="noticias-section">Notícias</button>
   </nav>
 
   <main>
@@ -43,10 +44,20 @@
       </nav>
       <div id="proposicoes-list" class="cards-container"></div>
     </section>
+
+    <section id="noticias-section" class="hidden" role="tabpanel" aria-labelledby="btn-noticias">
+        <h2>Notícias de Política</h2>
+        <nav id="filtro-noticias" class="filters hidden">
+            <label for="search-noticias">Pesquisar Notícias de Política:</label>
+            <input type="text" id="search-noticias" placeholder="Ex: reforma tributária" aria-label="Pesquisar notícias de política" />
+            <button id="filter-noticias-btn" aria-label="Buscar Notícias">Buscar</button>
+        </nav>
+        <div id="noticias-list" class="cards-container"></div>
+    </section>
   </main>
 
   <footer>
-    <p>Dados fornecidos por <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener noreferrer">Câmara dos Deputados</a></p>
+    <p>Dados fornecidos por <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener noreferrer">Câmara dos Deputados</a> e <a href="https://newsapi.org/" target="_blank" rel="noopener noreferrer">News API</a></p>
   </footer>
 
   <script src="script.js"></script>
