@@ -1,11 +1,7 @@
 let todosDeputados = [];
 let todasProposicoes = [];
-let todasNoticias = []; // Variável para armazenar as notícias
-
-// IMPORTANTE: Obtenha sua chave de API no site da News API (newsapi.org)
-// e coloque-a aqui entre as aspas.
-// MANTENHA ESTA CHAVE SEGURA SE ESTIVER EM PRODUÇÃO, mas para este trabalho, está ok aqui.
-const NEWS_API_KEY = '7a67384d04f74b92b0c196a0a5aa9dea'; // <--- SUBSTITUA PELA SUA CHAVE!
+let todasNoticias = []; 
+const NEWS_API_KEY = '7a67384d04f74b92b0c196a0a5aa9dea'; // 
 
 
 // --- Funções de Carregamento de Dados ---
@@ -47,31 +43,33 @@ async function carregarProposicoesIniciais() {
     }
 }
 
-// NOVA FUNÇÃO: Carregar Notícias da News API
+
 async function carregarNoticias(query = '') {
     let url;
+    // Define um termo padrão se a busca estiver vazia
+    const defaultQuery = "política"; 
+
     if (query.trim() === '') {
-        // Se a query estiver vazia, pega as top-headlines de política do Brasil
-        url = `https://newsapi.org/v2/top-headlines?country=br&category=politics&apiKey=${NEWS_API_KEY}`;
+        // Se a query estiver vazia, usa o termo padrão no endpoint 'everything'
+        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(defaultQuery)}&language=pt&sortBy=relevancy&apiKey=${NEWS_API_KEY}`;
     } else {
-        // Se houver query, busca por ela e adiciona "política" para focar o resultado
-        url = `https://newsapi.org/v2/everything?q=${query}+política&language=pt&sortBy=relevancy&apiKey=${NEWS_API_KEY}`;
+        
+        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query + " política")}&language=pt&sortBy=relevancy&apiKey=${NEWS_API_KEY}`;
     }
 
     try {
         const res = await fetch(url);
         if (!res.ok) {
-            // News API retorna erros úteis no JSON mesmo se !res.ok
             const errorData = await res.json();
             console.error('Erro na API de Notícias:', res.status, errorData.message || 'Erro desconhecido.');
             renderizarNoticias([]);
             return;
         }
         
-        const data = await res.json(); // News API retorna JSON
+        const data = await res.json();
 
         if (data.status === 'ok' && data.articles) {
-            todasNoticias = data.articles; // Armazena as notícias carregadas
+            todasNoticias = data.articles;
             renderizarNoticias(todasNoticias);
         } else {
             console.error('Dados de notícias não encontrados ou status não OK:', data.message);
@@ -129,7 +127,6 @@ function renderizarProposicoes(proposicoes) {
     });
 }
 
-// NOVA FUNÇÃO: Renderizar Notícias
 function renderizarNoticias(noticias) {
     const container = document.getElementById('noticias-list');
     container.innerHTML = '';
@@ -140,8 +137,7 @@ function renderizarNoticias(noticias) {
     }
 
     noticias.forEach(n => {
-        // A News API fornece o título, descrição, URL da notícia e URL da imagem.
-        // Use 'n.source.name' para a fonte da notícia.
+
         container.innerHTML += `
             <div class="noticia-card">
                 <h3>${n.title || 'Sem Título'}</h3>
@@ -243,13 +239,12 @@ document.getElementById('btn-proposicoes').addEventListener('click', () => {
 document.getElementById('btn-noticias').addEventListener('click', () => {
     mostrarSecao('noticias-section');
     ativarBotao('btn-noticias');
-    carregarNoticias(); // Carrega as notícias mais recentes de política ao clicar na aba
+    carregarNoticias(); 
 });
 
-// NOVO EVENTO: Botão para aplicar filtro/pesquisa de Notícias
 document.getElementById('filter-noticias-btn').addEventListener('click', () => {
     const query = document.getElementById('search-noticias').value;
-    carregarNoticias(query); // Passa o termo de pesquisa para a função
+    carregarNoticias(query); 
 });
 
 
@@ -257,12 +252,11 @@ function mostrarSecao(id) {
     // Esconde todas as seções principais
     document.getElementById('deputados-section').classList.add('hidden');
     document.getElementById('proposicoes-section').classList.add('hidden');
-    document.getElementById('noticias-section').classList.add('hidden'); // Adicionado
-
+    document.getElementById('noticias-section').classList.add('hidden'); 
     // Esconde todas as barras de filtro
     document.getElementById('filtro-deputados').classList.add('hidden');
     document.getElementById('filtro-proposicoes').classList.add('hidden');
-    document.getElementById('filtro-noticias').classList.add('hidden'); // Adicionado
+    document.getElementById('filtro-noticias').classList.add('hidden'); 
 
     // Mostra a seção selecionada
     document.getElementById(id).classList.remove('hidden');
@@ -290,5 +284,4 @@ window.onload = () => {
     carregarProposicoesIniciais();
     mostrarSecao('deputados-section');
     ativarBotao('btn-deputados');
-    // As notícias serão carregadas apenas quando a aba 'Notícias' for clicada.
 };
